@@ -11,7 +11,6 @@ import http from "http";
 import cors from "cors";
 
 dotenv.config();
-async () => {};
 const pgDbUser = process.env.PG_DATABASE_USER;
 const pgDbName = process.env.PG_DATABASE_NAME;
 const pgDbPassword = process.env.PG_DATABASE_PASSWORD;
