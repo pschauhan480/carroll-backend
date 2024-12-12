@@ -1,26 +1,24 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
-const dbUser = process.env.DATABASE_USER;
-const dbName = process.env.DATABASE_NAME;
-const dbPassword = process.env.DATABASE_PASSWORD;
-const dbHost = process.env.DATABASE_HOST;
-const dbPort = process.env.DATABASE_PORT;
+const pgDbUser = process.env.PG_DATABASE_USER;
+const pgDbName = process.env.PG_DATABASE_NAME;
+const pgDbPassword = process.env.PG_DATABASE_PASSWORD;
+const pgDbHost = process.env.PG_DATABASE_HOST;
+const pgDbPort = process.env.PG_DATABASE_PORT;
 
 const dbSyncForce = process.env.DATABASE_SYNC_FORCE;
 
 const { Sequelize, DataTypes } = require("sequelize");
 
-pgURL = `postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`;
+pgURL = `postgres://${pgDbUser}:${pgDbPassword}@${pgDbHost}:${pgDbPort}/${pgDbName}`;
 // console.log(pgURL);
 
-const sequelize = new Sequelize(
-  `postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`
-);
+const sequelize = new Sequelize(pgURL);
 
 try {
   sequelize.authenticate();
-  console.log("Connection has been established successfully.");
+  console.log("postgres connection has been established successfully.");
 } catch (error) {
   console.error("Unable to connect to the database:", error);
   return;
@@ -66,6 +64,38 @@ if (dbSyncForce) {
   sequelize.sync({ force: true });
 } else {
   sequelize.sync({ force: false });
+}
+
+const mongoose = require("mongoose");
+
+const { Schema } = mongoose;
+
+// const mongoDbUser = process.env.MONGO_DATABASE_USER;
+const mongoDbName = process.env.MONGO_DATABASE_NAME;
+// const mongoDbPassword = process.env.MONGO_DATABASE_PASSWORD;
+const mongoDbHost = process.env.MONGO_DATABASE_HOST;
+const mongoDbPort = process.env.MONGO_DATABASE_PORT;
+
+const bookMetadataSchema = new Schema({
+  bookID: String,
+  data: Schema.Types.Mixed,
+});
+const bookMetadataModel = mongoose.model("book_metadata", bookMetadataSchema);
+const auditLogSchema = new Schema({
+  log: Schema.Types.Mixed,
+  createdBy: String,
+  createdAt: Schema.Types.Date,
+  updatedBy: String,
+  updatedAt: Schema.Types.Date,
+});
+const auditLogModel = mongoose.model("audit_log", auditLogSchema);
+
+try {
+  mongoose.connect(`mongodb://${mongoDbHost}:${mongoDbPort}/${mongoDbName}`);
+  console.log("mongo connection has been established successfully.");
+} catch (error) {
+  console.error("Unable to connect to the mongo database:", error);
+  return;
 }
 
 const express = require("express");
