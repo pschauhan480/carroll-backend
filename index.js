@@ -1,6 +1,5 @@
 import * as dotenv from "dotenv";
 import { typeDefs, resolvers } from "./schema.js";
-import { Sequelize, DataTypes } from "sequelize";
 import mongoose from "mongoose";
 
 import { ApolloServer } from "@apollo/server";
@@ -18,66 +17,14 @@ const pgDbPassword = process.env.PG_DATABASE_PASSWORD;
 const pgDbHost = process.env.PG_DATABASE_HOST;
 const pgDbPort = process.env.PG_DATABASE_PORT;
 
-const dbSyncForce = process.env.DATABASE_SYNC_FORCE;
+export const dbSyncForce = process.env.DATABASE_SYNC_FORCE;
 
-const pgURL = `postgres://${pgDbUser}:${pgDbPassword}@${pgDbHost}:${pgDbPort}/${pgDbName}`;
+export const pgURL = `postgres://${pgDbUser}:${pgDbPassword}@${pgDbHost}:${pgDbPort}/${pgDbName}`;
 // console.log(pgURL);
 
-const sequelize = new Sequelize(pgURL);
+import { InitPGConnection } from "./pg_operations.js";
 
-try {
-  sequelize.authenticate();
-  console.log("postgres connection has been established successfully.");
-} catch (error) {
-  console.error("Unable to connect to the database:", error);
-}
-
-const Book = sequelize.define(
-  "Book",
-  {
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-    },
-    published_date: {
-      type: DataTypes.TIME,
-    },
-  },
-  {}
-);
-
-const Author = sequelize.define(
-  "Author",
-  {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    biography: {
-      type: DataTypes.STRING,
-    },
-    born_date: {
-      type: DataTypes.DATE,
-    },
-  },
-  {}
-);
-
-// console.log(Book === sequelize.models.Book);
-// console.log(Author === sequelize.models.Author);
-
-Book.belongsToMany(Author, { through: "AuthorBooks" });
-Author.belongsToMany(Book, { through: "AuthorBooks" });
-
-if (dbSyncForce === "1") {
-  console.log("force sync database", dbSyncForce);
-  sequelize.sync({ force: true });
-} else {
-  sequelize.sync({ force: false });
-}
+InitPGConnection(pgURL, dbSyncForce);
 
 const { Schema } = mongoose;
 
