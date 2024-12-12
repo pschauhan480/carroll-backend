@@ -7,6 +7,8 @@ const dbPassword = process.env.DATABASE_PASSWORD;
 const dbHost = process.env.DATABASE_HOST;
 const dbPort = process.env.DATABASE_PORT;
 
+const dbSyncForce = process.env.DATABASE_SYNC_FORCE;
+
 const { Sequelize, DataTypes } = require("sequelize");
 
 pgURL = `postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`;
@@ -60,7 +62,11 @@ const Author = sequelize.define(
 
 console.log(Book === sequelize.models.Book);
 console.log(Author === sequelize.models.Author);
-sequelize.sync({ force: false });
+if (dbSyncForce) {
+  sequelize.sync({ force: true });
+} else {
+  sequelize.sync({ force: false });
+}
 
 const express = require("express");
 const app = express();
