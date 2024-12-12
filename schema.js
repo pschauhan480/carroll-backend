@@ -56,8 +56,8 @@ export const resolvers = {
             if (Book) {
                 console.log("create book request", req.book);
                 const newBook = Book.build(req.book);
-                console.log(newBook instanceof Book);
-                console.log(newBook.name);
+                // console.log(newBook instanceof Book);
+                // console.log(newBook.name);
                 await newBook.save();
                 return newBook;
             } else {
