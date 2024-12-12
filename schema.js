@@ -1,17 +1,21 @@
 export const typeDefs = `#graphql
-  # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
+  scalar Date
 
-  # This "Book" type defines the queryable fields for every book in our data source.
   type Book {
     title: String
-    author: String
+    description: String
+    published_date: Date
   }
 
-  # The "Query" type is special: it lists all of the available queries that
-  # clients can execute, along with the return type for each. In this
-  # case, the "books" query returns an array of zero or more Books (defined above).
+  type Author {
+    name: String
+    biography: String
+    born_date: Date
+  }
+
   type Query {
     books: [Book]
+    authors: [Author]
   }
 `;
 
@@ -19,4 +23,20 @@ export const resolvers = {
   Query: {
     books: () => books,
   },
+  Date: new GraphQLScalarType({
+    name: "Date",
+    description: "Date custom scalar type",
+    parseValue(value) {
+      return new Date(value);
+    },
+    serialize(value) {
+      return value.getTime();
+    },
+    parseLiteral(ast) {
+      if (ast.kind === Kind.INT) {
+        return parseInt(ast.value, 10);
+      }
+      return null;
+    },
+  }),
 };
