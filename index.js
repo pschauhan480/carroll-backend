@@ -1,4 +1,12 @@
-const dotenv = require("dotenv");
+import * as dotenv from "dotenv";
+import { typeDefs, resolvers } from "./schema.js";
+import { Sequelize, DataTypes } from "sequelize";
+import mongoose from "mongoose";
+
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import express from "express";
+
 dotenv.config();
 
 const pgDbUser = process.env.PG_DATABASE_USER;
@@ -9,9 +17,7 @@ const pgDbPort = process.env.PG_DATABASE_PORT;
 
 const dbSyncForce = process.env.DATABASE_SYNC_FORCE;
 
-const { Sequelize, DataTypes } = require("sequelize");
-
-pgURL = `postgres://${pgDbUser}:${pgDbPassword}@${pgDbHost}:${pgDbPort}/${pgDbName}`;
+const pgURL = `postgres://${pgDbUser}:${pgDbPassword}@${pgDbHost}:${pgDbPort}/${pgDbName}`;
 // console.log(pgURL);
 
 const sequelize = new Sequelize(pgURL);
@@ -21,7 +27,6 @@ try {
   console.log("postgres connection has been established successfully.");
 } catch (error) {
   console.error("Unable to connect to the database:", error);
-  return;
 }
 
 const Book = sequelize.define(
@@ -66,8 +71,6 @@ if (dbSyncForce) {
   sequelize.sync({ force: false });
 }
 
-const mongoose = require("mongoose");
-
 const { Schema } = mongoose;
 
 // const mongoDbUser = process.env.MONGO_DATABASE_USER;
@@ -95,12 +98,10 @@ try {
   console.log("mongo connection has been established successfully.");
 } catch (error) {
   console.error("Unable to connect to the mongo database:", error);
-  return;
 }
 
-const express = require("express");
 const app = express();
-const port = 3000;
+const port = process.env.SERVER_PORT;
 
 app.get("/", (req, res) => {
   res.send("Hello, world!");
