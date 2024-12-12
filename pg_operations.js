@@ -1,8 +1,17 @@
 import { Sequelize, DataTypes } from "sequelize";
-// import { pgURL, dbSyncForce } from ".";
+
+export let sequelize;
+
+export function ClosePGConnection() {
+  if (sequelize) {
+    sequelize.close();
+  }
+}
+
+export let Book, Author;
 
 export function InitPGConnection(pgURL, dbSyncForce) {
-  const sequelize = new Sequelize(pgURL);
+  sequelize = new Sequelize(pgURL);
 
   try {
     sequelize.authenticate();
@@ -11,7 +20,7 @@ export function InitPGConnection(pgURL, dbSyncForce) {
     console.error("Unable to connect to the database:", error);
   }
 
-  const Book = sequelize.define(
+  Book = sequelize.define(
     "Book",
     {
       title: {
@@ -28,7 +37,7 @@ export function InitPGConnection(pgURL, dbSyncForce) {
     {}
   );
 
-  const Author = sequelize.define(
+  Author = sequelize.define(
     "Author",
     {
       name: {
