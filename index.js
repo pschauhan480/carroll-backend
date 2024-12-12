@@ -66,13 +66,14 @@ const Author = sequelize.define(
   {}
 );
 
-console.log(Book === sequelize.models.Book);
-console.log(Author === sequelize.models.Author);
+// console.log(Book === sequelize.models.Book);
+// console.log(Author === sequelize.models.Author);
 
 Book.belongsToMany(Author, { through: "AuthorBooks" });
-Actor.belongsToMany(Book, { through: "AuthorBooks" });
+Author.belongsToMany(Book, { through: "AuthorBooks" });
 
-if (dbSyncForce) {
+if (dbSyncForce === "1") {
+  console.log("force sync database", dbSyncForce);
   sequelize.sync({ force: true });
 } else {
   sequelize.sync({ force: false });

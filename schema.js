@@ -1,3 +1,5 @@
+import { GraphQLScalarType, Kind } from "graphql";
+
 export const typeDefs = `#graphql
   scalar Date
 
@@ -21,7 +23,9 @@ export const typeDefs = `#graphql
 
 export const resolvers = {
   Query: {
-    books: () => books,
+    books: () => {
+      return [];
+    },
   },
   Date: new GraphQLScalarType({
     name: "Date",
