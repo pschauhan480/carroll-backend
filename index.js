@@ -5,10 +5,13 @@ import mongoose from "mongoose";
 
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import express from "express";
+import http from "http";
+import cors from "cors";
 
 dotenv.config();
-
+async () => {};
 const pgDbUser = process.env.PG_DATABASE_USER;
 const pgDbName = process.env.PG_DATABASE_NAME;
 const pgDbPassword = process.env.PG_DATABASE_PASSWORD;
@@ -102,6 +105,27 @@ try {
 
 const app = express();
 const port = process.env.SERVER_PORT;
+
+const httpServer = http.createServer(app);
+
+const graphqlServer = new ApolloServer({
+  typeDefs,
+  resolvers,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+});
+
+await graphqlServer.start();
+
+app.use(
+  "/graphql",
+  cors(),
+  express.json(),
+  // expressMiddleware accepts the same arguments:
+  // an Apollo Server instance and optional configuration options
+  expressMiddleware(graphqlServer, {
+    context: async ({ req }) => ({ token: req.headers.token }),
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Hello, world!");
