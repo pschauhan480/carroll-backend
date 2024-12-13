@@ -20,9 +20,17 @@ export const typeDefs = `#graphql
         born_date: Date
     }
 
+    type BookReview {
+        id: ID
+        bookid: ID
+        rating: String
+        review: String
+    }
+
     type Query {
         books: [Book]
         authors: [Author]
+        bookreviews(id: ID!): [BookReview]
     }
 
     input BookInput {
