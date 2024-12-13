@@ -2,13 +2,15 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
+export let bookReviewsModel, auditLogModel;
+
 export function InitMongoConnection(mongoURL) {
     const bookReviewSchema = new Schema({
         bookID: String,
         review: String,
         rating: Number,
     });
-    const bookReviewsModel = mongoose.model("book_review", bookReviewSchema);
+    bookReviewsModel = mongoose.model("book_review", bookReviewSchema);
 
     const auditLogSchema = new Schema({
         log: Schema.Types.Mixed,
@@ -17,7 +19,7 @@ export function InitMongoConnection(mongoURL) {
         updatedBy: String,
         updatedAt: Schema.Types.Date,
     });
-    const auditLogModel = mongoose.model("audit_log", auditLogSchema);
+    auditLogModel = mongoose.model("audit_log", auditLogSchema);
 
     try {
         mongoose.connect(mongoURL);
