@@ -1,6 +1,5 @@
 import * as dotenv from "dotenv";
 import { typeDefs, resolvers } from "./schema.js";
-import mongoose from "mongoose";
 
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
@@ -8,6 +7,9 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import express from "express";
 import http from "http";
 import cors from "cors";
+
+import { InitPGConnection } from "./pg_operations.js";
+import { InitMongoConnection } from "./mongo_operations.js";
 
 dotenv.config();
 
@@ -22,11 +24,7 @@ export const dbSyncForce = process.env.DATABASE_SYNC_FORCE;
 export const pgURL = `postgres://${pgDbUser}:${pgDbPassword}@${pgDbHost}:${pgDbPort}/${pgDbName}`;
 // console.log(pgURL);
 
-import { InitPGConnection } from "./pg_operations.js";
-
 InitPGConnection(pgURL, dbSyncForce);
-
-const { Schema } = mongoose;
 
 // const mongoDbUser = process.env.MONGO_DATABASE_USER;
 const mongoDbName = process.env.MONGO_DATABASE_NAME;
@@ -34,26 +32,9 @@ const mongoDbName = process.env.MONGO_DATABASE_NAME;
 const mongoDbHost = process.env.MONGO_DATABASE_HOST;
 const mongoDbPort = process.env.MONGO_DATABASE_PORT;
 
-const bookMetadataSchema = new Schema({
-    bookID: String,
-    data: Schema.Types.Mixed,
-});
-const bookMetadataModel = mongoose.model("book_metadata", bookMetadataSchema);
-const auditLogSchema = new Schema({
-    log: Schema.Types.Mixed,
-    createdBy: String,
-    createdAt: Schema.Types.Date,
-    updatedBy: String,
-    updatedAt: Schema.Types.Date,
-});
-const auditLogModel = mongoose.model("audit_log", auditLogSchema);
+const mongoURL = `mongodb://${mongoDbHost}:${mongoDbPort}/${mongoDbName}`;
 
-try {
-    mongoose.connect(`mongodb://${mongoDbHost}:${mongoDbPort}/${mongoDbName}`);
-    console.log("mongo connection has been established successfully.");
-} catch (error) {
-    console.error("Unable to connect to the mongo database:", error);
-}
+InitMongoConnection(mongoURL);
 
 const app = express();
 const port = process.env.SERVER_PORT;
