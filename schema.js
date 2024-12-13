@@ -29,8 +29,10 @@ export const typeDefs = `#graphql
 
     type Query {
         books: [Book]
+        book(id: ID, title: String): [Book]
         authors: [Author]
-        bookreviews(id: ID!): [BookReview]
+        author(id: ID, name: String): [Author]
+        bookreviews(bookid: ID!): [BookReview]
     }
 
     input BookInput {
